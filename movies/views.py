@@ -28,7 +28,8 @@ def point(request,movie_pk):
             movie = get_object_or_404(Movie,pk=movie_pk)
             serializer.save(pointing_user=request.user,pointed_movie=movie)
             return Response({
-                "message":"성공적으로 생성되었습니다.",})
+                "message":"성공적으로 생성되었습니다.",
+                })
     elif request.method == 'PUT':
         point = MovieStarPoint.objects.filter(pointed_movie=movie_pk).filter(pointing_user=request.user.pk)
         print(point)
@@ -36,6 +37,11 @@ def point(request,movie_pk):
         if serializer.is_valid():
             serializer.save()
             return Response({
-                "message":"성공적으로 수정되었습니다.",})
+                "message":"성공적으로 수정되었습니다.",
+                })
 
-
+@api_view(['GET'])
+def nowplaying(request):
+    movies = Movie.objects.filter(nowplaying=True).order_by('-release_date')
+    serializer = MovieListSerializer(movies, many=True)
+    return Response(serializer.data)

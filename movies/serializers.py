@@ -20,6 +20,7 @@ class MovieListSerializer(serializers.ModelSerializer):
         # fields = '__all__'
         read_only_fields = ['pointing_users']
 
+
 class MovieStarPointUpdateSerializer(serializers.ModelSerializer):
     # pointing_users = MovieStarPointSerializer(source='moviestarpoint_set', many=True, required=False)
     pointing_user = serializers.ModelSerializer(required=False)
