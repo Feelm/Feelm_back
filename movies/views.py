@@ -5,7 +5,9 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth import get_user_model
 from .models import Movie, MovieStarPoint
-from .serializers import MovieListSerializer, MovieStarPointSerializer, MovieStarPointUpdateSerializer
+from .serializers import MovieDetailSerializer,MovieListSerializer, MovieStarPointSerializer, MovieStarPointUpdateSerializer
+
+from django.db.models import Avg, Max, Min, Sum, Count
 
 # 라인브레이크
 # from django.template.defaultfilters import linebreaks
@@ -15,6 +17,15 @@ from .serializers import MovieListSerializer, MovieStarPointSerializer, MovieSta
 def index(request):
     movies = Movie.objects.order_by('-release_date')
     serializer = MovieListSerializer(movies, many=True)
+    return Response(serializer.data)
+
+@api_view(['GET'])
+def movie_detail(request,movie_pk):
+    movie = get_object_or_404(Movie, pk=movie_pk)
+    # print(movie.star)
+    # point = MovieStarPoint.objects.filter(pointed_movie=movie_pk).aggregate(Avg('star_point'))['star_point__avg']
+    serializer = MovieDetailSerializer(movie)
+    # print(serializer.data.star)
     return Response(serializer.data)
 
 
@@ -32,7 +43,6 @@ def point(request,movie_pk):
                 })
     elif request.method == 'PUT':
         point = MovieStarPoint.objects.filter(pointed_movie=movie_pk).filter(pointing_user=request.user.pk)
-        print(point)
         serializer = MovieStarPointUpdateSerializer(point[0],data=request.data)
         if serializer.is_valid():
             serializer.save()

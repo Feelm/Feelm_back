@@ -1,7 +1,8 @@
 from django.db import models
 from django.conf import settings
 from django.contrib.auth import get_user_model
-import requests
+
+from django.db.models import Avg
 # Create your models here.
 User = get_user_model()
 
@@ -25,6 +26,10 @@ class Movie(models.Model):
     pointing_users = models.ManyToManyField(User, related_name='pointed_movies', through='MovieStarPoint')
     nowplaying = models.BooleanField(default=False)
     upcoming = models.BooleanField(default=False)
+    
+    @property
+    def star(self):
+        return self.moviestarpoint_set.aggregate(Avg('star_point'))['star_point__avg']
 
 
 
