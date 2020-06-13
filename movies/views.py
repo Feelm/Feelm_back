@@ -45,3 +45,17 @@ def nowplaying(request):
     movies = Movie.objects.filter(nowplaying=True).order_by('-release_date')
     serializer = MovieListSerializer(movies, many=True)
     return Response(serializer.data)
+
+
+@api_view(['GET'])
+def upcoming(request):
+    movies = Movie.objects.filter(upcoming=True).order_by('-release_date')
+    serializer = MovieListSerializer(movies, many=True)
+    return Response(serializer.data)
+
+
+@api_view(['GET'])
+def recent(request):
+    movies = Movie.objects.filter(upcoming=False).order_by('-release_date')[:10]
+    serializer = MovieListSerializer(movies, many=True)
+    return Response(serializer.data)

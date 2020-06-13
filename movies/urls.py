@@ -7,6 +7,8 @@ urlpatterns = [
     path('', views.index, name='index'),
     path('<int:movie_pk>/point/', views.point, name='point'),
     path('nowplaying/', views.nowplaying, name='nowplaying'),
+    path('upcoming/', views.upcoming, name='upcoming'),
+    path('recent/', views.recent, name='recent'),
     
     # path('create/', views.movie_create, name='movie_create'),
     # path('<int:movie_pk>/update/', views.movie_update, name='movie_update'),
