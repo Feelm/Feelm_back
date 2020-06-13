@@ -1,14 +1,17 @@
 from rest_framework import serializers
-from .models import Movie, Movie_Star_Point
+from .models import Movie, MovieStarPoint
 from django.contrib.auth import get_user_model
 from accounts.serializers import CustomUserDetailsSerializer
 
 User = get_user_model()
 
 class MovieStarPointSerializer(serializers.ModelSerializer):
+    # pointing_user = serializers.ReadOnlyField(source='pointing_users.user')
+    # pointed_movie = serializers.ReadOnlyField(source='movie.id')
+    
     class Meta:
-        model = Movie_Star_Point
-        fields = ('pointing_user', 'pointed_movie', 'star_point')
+        model = MovieStarPoint
+        fields = ( 'star_point','pointing_user', 'pointed_movie',)
         # fields= '__all__'
 
 # class MovieSerializer(serializers.ModelSerializer):
@@ -25,8 +28,8 @@ class MovieStarPointSerializer(serializers.ModelSerializer):
 
 
 class MovieListSerializer(serializers.ModelSerializer):
-    # pointing_users = MovieStarPointSerializer(many=True, required=False)
-
+    pointing_users = MovieStarPointSerializer(source='moviestarpoint_set', many=True, required=False)
+    # pointing_users = MovieStarPointSerializer(source='pointed_movie_set',many=True, read_only=True, required=False)
     class Meta:
         model = Movie
         # fields = ('id', 'title',)

@@ -20,12 +20,12 @@ class Movie(models.Model):
     poster_path = models.CharField(max_length=100)
     backdrop_path = models.CharField(max_length=100, default='')
     genres = models.ManyToManyField(Genre, related_name='movies')
-    pointing_users = models.ManyToManyField(User, related_name='pointed_movies', through='Movie_Star_Point')
+    pointing_users = models.ManyToManyField(User, related_name='pointed_movies', through='MovieStarPoint')
 
 
-class Movie_Star_Point(models.Model):
+class MovieStarPoint(models.Model):
+    star_point = models.IntegerField(default=0)
     pointing_user = models.ForeignKey(User, on_delete=models.CASCADE)
     pointed_movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
-    star_point = models.IntegerField(default=0)
 
     # like_users = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='like_movies')
