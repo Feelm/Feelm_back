@@ -16,7 +16,7 @@ class MovieListSerializer(serializers.ModelSerializer):
     pointing_users = MovieStarPointSerializer(source='moviestarpoint_set', many=True, required=False)
     class Meta:
         model = Movie
-        fields = ('id', 'title','pointing_users')
+        fields = ('id', 'title','poster_path','vote_average' ,'pointing_users')
         # fields = '__all__'
         read_only_fields = ['pointing_users']
 
