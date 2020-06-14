@@ -56,7 +56,7 @@ INSTALLED_APPS = [
     ###
     'accounts',
     'movies',
-    'reviews',
+    # 'reviews',
 ]
 
 SITE_ID = 1
