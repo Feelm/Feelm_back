@@ -5,12 +5,12 @@ app_name = 'movies'
 
 urlpatterns = [
     path('', views.index, name='index'),
-    path('<int:movie_pk>/', views.movie_detail, name='movie_detail'),
-    path('<int:movie_pk>/point/', views.point, name='point'),
-    path('nowplaying/', views.nowplaying, name='nowplaying'),
-    path('upcoming/', views.upcoming, name='upcoming'),
-    path('recent/', views.recent, name='recent'),
-    
+    path('<int:movie_pk>/', views.movie_detail, name = 'movie_detail'),
+    path('<int:movie_pk>/point/', views.point, name = 'point'),
+    path('nowplaying/', views.nowplaying, name ='nowplaying'),
+    path('upcoming/', views.upcoming, name ='upcoming'),
+    path('recent/', views.recent, name ='recent'),
+    path('recommend/', views.recommend, name = 'recommend'),
     # path('create/', views.movie_create, name='movie_create'),
     # path('<int:movie_pk>/update/', views.movie_update, name='movie_update'),
     # path('<int:movie_pk>/delete/', views.movie_delete, name='movie_delete'),

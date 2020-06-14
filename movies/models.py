@@ -1,7 +1,7 @@
 from django.db import models
 from django.conf import settings
 from django.contrib.auth import get_user_model
-
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db.models import Avg
 # Create your models here.
 User = get_user_model()
@@ -29,13 +29,15 @@ class Movie(models.Model):
     
     @property
     def star(self):
-        return self.moviestarpoint_set.aggregate(Avg('star_point'))['star_point__avg']
+        pointing_num = self.moviestarpoint_set.count()
+        if pointing_num ==0:
+            return self.vote_average
+        else:
+            return self.moviestarpoint_set.aggregate(Avg('star_point'))['star_point__avg']
 
 
 
 class MovieStarPoint(models.Model):
-    star_point = models.IntegerField(default=0)
+    star_point = models.FloatField(default=0, validators=[MinValueValidator(0),MaxValueValidator(10)])
     pointing_user = models.ForeignKey(User, on_delete=models.CASCADE)
     pointed_movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
-
-    # like_users = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='like_movies')

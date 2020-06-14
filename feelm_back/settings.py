@@ -168,11 +168,11 @@ ACCOUNT_LOGOUT_ON_GET = True
 # REST_AUTH_SERIALIZERS = {
    
 # }
-# REST_AUTH_REGISTER_SERIALIZERS = {
-    
-# }
+REST_AUTH_REGISTER_SERIALIZERS = {
+    "REGISTER_SERIALIZER": "accounts.serializers.CustomRegisterSerializer",
+}
 REST_AUTH_SERIALIZERS = {
     'LOGIN_SERIALIZER': 'accounts.serializers.CustomLoginSerializer',
      "USER_DETAILS_SERIALIZER": "accounts.serializers.CustomUserDetailsSerializer",
-     "REGISTER_SERIALIZER": "accounts.serializers.CustomRegisterSerializer",
+     
 }

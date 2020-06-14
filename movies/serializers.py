@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from .models import Movie, MovieStarPoint
 from django.contrib.auth import get_user_model
-from accounts.serializers import CustomUserDetailsSerializer
+# from accounts.serializers import CustomUserDetailsSerializer
 
 User = get_user_model()
 
