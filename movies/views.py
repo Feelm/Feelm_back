@@ -124,9 +124,13 @@ def review(request,movie_pk,review_pk):
                 })
     elif request.method == 'DELETE':
         review = get_object_or_404(Review, pk=review_pk)
-        review.delete()
+        if request.user == review.user:
+            review.delete()
+            result = f"{review_pk}글이 성공적으로 삭제되었습니다."
+        else:
+            result = '다른사람의 글은 삭제 할 수 없습니다.'
         return Response({
-                "message": f"{review_pk}글이 성공적으로 삭제되었습니다.",
+                "message": result,
                 })
 
 @api_view(['POST'])
