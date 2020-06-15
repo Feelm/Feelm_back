@@ -8,9 +8,10 @@ from rest_framework.permissions import IsAuthenticated
 
 from .models import Movie, MovieStarPoint, Review
 from .serializers import * #MovieDetailSerializer,MovieListSerializer, MovieStarPointSerializer, MovieStarPointUpdateSerializer, ReviewCreateSerializer, ReviewDetailSerializer
-
+# from boards.serializers import RequestBoardSerializer
 import random 
-
+import requests
+from datetime import datetime
 # 라인브레이크
 # from django.template.defaultfilters import linebreaks
 
@@ -24,11 +25,42 @@ def index(request):
     return Response(serializer.data)
 
 
-@api_view(['GET'])
+@api_view(['GET','POST'])
 def movie_detail(request,movie_pk):
-    movie = get_object_or_404(Movie, pk=movie_pk)
-    serializer = MovieDetailSerializer(movie)
-    return Response(serializer.data)
+    if request.method == 'GET':
+        movie = get_object_or_404(Movie, pk=movie_pk)
+        serializer = MovieDetailSerializer(movie)
+        return Response(serializer.data)
+    elif request.method == 'POST':
+        if not Movie.objects.filter(id=movie_pk).exists():
+            url = f'https://api.themoviedb.org/3/movie/{movie_pk}?api_key=fcf50b1b6b84aa2265ae58bcd7596305&language=ko-KR'
+            res = requests.get(url).json()
+            movie = Movie()
+            movie.id = res['id']
+            movie.title = res['title']
+            movie.original_title = res['original_title']
+            movie.release_date = res['release_date']
+            movie.popularity = res['popularity']
+            movie.vote_count = res['vote_count']
+            movie.vote_average = res['vote_average']
+            movie.adult = res['adult']
+            movie.overview = res['overview']
+            movie.original_language = res['original_language']
+            movie.poster_path = res['poster_path']
+            movie.backdrop_path = res['backdrop_path']
+            movie.genres_set = res['genres']
+            if datetime.today().strftime("%Y-%m-%d")>res['release_date']:
+                movie.upcoming = False
+            else:
+                movie.upcoming = True
+            movie.nowplaying = False
+            movie.save()
+  
+            result = '영화가 추가 되었습니다.'
+        else:
+            result = '이미 있는 영화입니다.'
+        return Response({'message': result})
+        
 
 
 @api_view(['POST','PUT'])
@@ -191,3 +223,4 @@ def comment_detail(request,movie_pk,review_pk,comment_pk):
         return Response({
                 "message": result,
                 })
+

@@ -4,7 +4,6 @@ from rest_framework.response import Response
 from rest_auth.models import TokenModel
 # Create your views here.
 
-print(TokenModel.objects.all())
 User=get_user_model()
 def withdraw(request, user_pk):
     user= get_object_or_404(User,pk=user_pk)

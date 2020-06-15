@@ -6,7 +6,7 @@ app_name = 'movies'
 urlpatterns = [
     # 영화 최신순으로 모든 리스트 GET
     path('', views.index, name='index'),
-    # 영화 하나하나 디테일 GET
+    # 영화 하나하나 디테일 GET 관리자만 영화 추가가능 POST
     path('<int:movie_pk>/', views.movie_detail, name = 'movie_detail'),
     # 영화 하나의 별점 부여 (POST), 별점 수정(PUT)
     path('<int:movie_pk>/point/', views.point, name = 'point'),
