@@ -10,7 +10,7 @@ try:
 
 except ImportError:
     raise ImportError("allauth needs to be added to INSTALLED_APPS.")
-from movies.serializers import MovieStarPointSerializer
+# from movies.serializers import MovieStarPointSerializer
 
 
 User = get_user_model()
@@ -55,8 +55,8 @@ class CustomRegisterSerializer(RegisterSerializer):
         user.save()
         return user
 
-class CustomUserDetailsSerializer(serializers.ModelSerializer):
-    pointed_movies = MovieStarPointSerializer(source='moviestarpoint_set', many=True, required=False)
+class CustomUserDetailSerializer(serializers.ModelSerializer):
+    # pointed_movies = MovieStarPointSerializer(source='moviestarpoint_set', many=True, required=False)
 
     class Meta:
         model = User

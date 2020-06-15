@@ -7,7 +7,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 
 from .models import Movie, MovieStarPoint, Review
-from .serializers import MovieDetailSerializer,MovieListSerializer, MovieStarPointSerializer, MovieStarPointUpdateSerializer, ReviewCreateSerializer, ReviewDetailSerializer
+from .serializers import * #MovieDetailSerializer,MovieListSerializer, MovieStarPointSerializer, MovieStarPointUpdateSerializer, ReviewCreateSerializer, ReviewDetailSerializer
 
 import random 
 
@@ -92,22 +92,29 @@ def recommend(request):
     return
 
 
-@api_view(['POST'])
-def review_create(request,movie_pk):
-    serializer = ReviewCreateSerializer(data=request.data)
-    if serializer.is_valid(raise_exception=True):
-        movie = get_object_or_404(Movie,pk=movie_pk)
-        # 테스트용
-        user = get_object_or_404(User,pk=1)
-        serializer.save(user=user,movie=movie)
-        # # 실제 유저용
-        # serializer.save(user=request.user,movie=movie)
+@api_view(['GET','POST'])
+def review(request,movie_pk):
+    if request.method == 'GET':
+        movie = get_object_or_404(Movie, pk=movie_pk)
+        reviews = movie.review_set.order_by('-id')
+        serializers = ReviewSerializer(reviews, many=True)
+        return Response(serializers.data)
+    elif request.method == 'POST':    
+        serializer = ReviewCreateSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            movie = get_object_or_404(Movie,pk=movie_pk)
+            # # 테스트용
+            # user = get_object_or_404(User,pk=1)
+            # serializer.save(user=user,movie=movie)
+            # 실제 유저용
+            serializer.save(user=request.user,movie=movie)
+            result ="성공적으로 리뷰가 작성되었습니다."
         return Response({
-            "message":"성공적으로 글이 작성되었습니다.",
+            "message":result,
             })
 
 @api_view(['GET','PUT','DELETE'])
-def review(request,movie_pk,review_pk):
+def review_detail(request,movie_pk,review_pk):
     if request.method == 'GET':
         review = get_object_or_404(Review, pk= review_pk)
         review.view_count+=1
@@ -149,4 +156,38 @@ def review_like(request,movie_pk,review_pk):
             result = "자신의 글은 좋아요 할 수 없습니다."
         return Response({
                 "message": result
+                })
+
+@api_view(['GET','POST'])
+def comment(request, movie_pk, review_pk):
+    if request.method == 'GET':
+        review = get_object_or_404(Review, pk = review_pk)
+        comments = review.comment_set.order_by('-id')
+        serializers = CommentSerializer(comments, many=True)
+        return Response(serializers.data)
+    elif request.method == 'POST':
+        serializer = CommentCreateSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            review = get_object_or_404(Review,pk=review_pk)
+            # # 테스트용
+            # user = get_object_or_404(User,pk=1)
+            # serializer.save(user=user,movie=movie)
+            # 실제 유저용
+            serializer.save(user=request.user,review=review)
+            return Response({
+                "message":"성공적으로 댓글이 작성되었습니다.",
+                })
+
+@api_view(['DELETE'])
+def comment_detail(request,movie_pk,review_pk,comment_pk):
+    if request.method == 'DELETE':
+        comment = get_object_or_404(Comment, pk=comment_pk)
+        user = request.user
+        if request.user == comment.user:
+            comment.delete()
+            result = f"{comment_pk}글이 성공적으로 삭제되었습니다."
+        else:
+            result = '다른사람의 글은 삭제 할 수 없습니다.'
+        return Response({
+                "message": result,
                 })

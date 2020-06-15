@@ -1,7 +1,7 @@
 from rest_framework import serializers
-from .models import Movie, MovieStarPoint, Review
+from .models import Movie, MovieStarPoint, Review, Comment
 from django.contrib.auth import get_user_model
-# from accounts.serializers import CustomUserDetailsSerializer
+from accounts.serializers import CustomUserDetailSerializer
 
 User = get_user_model()
 
@@ -31,6 +31,7 @@ class MovieStarPointUpdateSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class ReviewDetailSerializer(serializers.ModelSerializer):
+    like = serializers.ReadOnlyField()
     class Meta:
         model = Review
         fields = '__all__'
@@ -53,6 +54,31 @@ class ReviewCreateSerializer(serializers.ModelSerializer):
         model = Review
         fields = ['movie','user','title','content']
         # read_only_fields = ['like_user']
+
+class ReviewSerializer(serializers.ModelSerializer):
+    user = serializers.SerializerMethodField()
+
+    def get_user(self,obj):
+        return obj.user.name
+    class Meta:
+        model = Review
+        # fields = ['id', 'title', '']
+        exclude = ['like_users']
+
+class CommentCreateSerializer(serializers.ModelSerializer):
+    review = serializers.ReadOnlyField(required = False)
+    user = serializers.ReadOnlyField(required= False)
+
+    class Meta:
+        model = Comment
+        fields = '__all__'
+
+class CommentSerializer(serializers.ModelSerializer):
+    # user = 
+    class Meta:
+        model = Comment
+        fields = '__all__'
+
 
 
 
