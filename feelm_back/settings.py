@@ -165,14 +165,12 @@ ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_USER_EMAIL_FIELD = 'email'
 ACCOUNT_LOGOUT_ON_GET = True
 
-# REST_AUTH_SERIALIZERS = {
+REST_AUTH_SERIALIZERS = {
+   'LOGIN_SERIALIZER': 'accounts.serializers.CustomLoginSerializer',
    
-# }
+    "USER_DETAILS_SERIALIZER": "accounts.serializers.CustomUserDetailSerializer",
+     
+}
 REST_AUTH_REGISTER_SERIALIZERS = {
     "REGISTER_SERIALIZER": "accounts.serializers.CustomRegisterSerializer",
-}
-REST_AUTH_SERIALIZERS = {
-    'LOGIN_SERIALIZER': 'accounts.serializers.CustomLoginSerializer',
-     "USER_DETAILS_SERIALIZER": "accounts.serializers.CustomUserDetailSerializer",
-     
 }

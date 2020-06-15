@@ -74,7 +74,9 @@ class CommentCreateSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class CommentSerializer(serializers.ModelSerializer):
-    # user = 
+    user = serializers.SerializerMethodField()
+    def get_user(self,obj):
+        return obj.user.name
     class Meta:
         model = Comment
         fields = '__all__'

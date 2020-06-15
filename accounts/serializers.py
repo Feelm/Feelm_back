@@ -16,7 +16,7 @@ except ImportError:
 User = get_user_model()
 
 class CustomRegisterSerializer(RegisterSerializer):
-    # username= None
+    username= None
     email = serializers.EmailField(required=True)
     name = serializers.CharField(required=True)
     password1 = serializers.CharField(write_only=True)
