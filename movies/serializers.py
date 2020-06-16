@@ -15,7 +15,7 @@ class MovieCreateSerializer(serializers.ModelSerializer):
     # overview=serializers.ModelSerializer(required=False)
     class Meta:
         model = Movie
-        exclude = ['genres','overview']
+        exclude = ['genres',]
         # fields = '__all__'
 
 class MovieStarPointSerializer(serializers.ModelSerializer):

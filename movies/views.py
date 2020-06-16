@@ -108,17 +108,23 @@ def recommend(request):
         return Response(serializer.data) 
     elif request.user.pointed_movies.count()>0:
         recommend_list =[]
+        recommend_id_list=[]
         most_movie = request.user.moviestarpoint_set.order_by('-star_point')[:5]
         for i in most_movie:
             url = f'https://api.themoviedb.org/3/movie/{i.pointed_movie.id}/recommendations?api_key=fcf50b1b6b84aa2265ae58bcd7596305&language=ko-KR&page=1'
             res = requests.get(url).json()['results'][:2]
-            recommend_list.extend(res)
-        recommend_list = list(set(recommend_list))
-        if len(recommend_list)<10:
-            d=10-len(recommend_list)
+            for j in res:
+                if j['id'] not in recommend_id_list:
+                    recommend_list.append(j)
+                    recommend_id_list.append(j['id'])
+        cnt=0
+        while len(recommend_list)<10:
             url = f'https://api.themoviedb.org/3/movie/{most_movie[0].pointed_movie.id}/recommendations?api_key=fcf50b1b6b84aa2265ae58bcd7596305&language=ko-KR&page=1'
-            res = requests.get(url).json()['results'][2:2+d]
-            recommend_list.extend(res)
+            res = requests.get(url).json()['results'][cnt+2]
+            if res['id'] not in recommend_id_list:
+                recommend_list.append(res)
+                recommend_id_list.append(res['id'])
+                cnt+=1
 
         # 추천영화가 db에 없으면 db에 추가
         for i in recommend_list:
@@ -126,7 +132,6 @@ def recommend(request):
             if not Movie.objects.filter(id=temp_id).exists():
                 url = f'https://api.themoviedb.org/3/movie/{temp_id}?api_key=fcf50b1b6b84aa2265ae58bcd7596305&language=ko-KR'
                 res = requests.get(url).json()
-                print(res)
                 serializers = MovieCreateSerializer(data=res)
                 release_date= datetime.strptime(res['release_date'],"%Y-%m-%d")
                 if datetime.today()>release_date:
