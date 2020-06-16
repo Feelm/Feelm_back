@@ -35,41 +35,29 @@ def movie_detail(request,movie_pk):
         if not Movie.objects.filter(id=movie_pk).exists():
             url = f'https://api.themoviedb.org/3/movie/{movie_pk}?api_key=fcf50b1b6b84aa2265ae58bcd7596305&language=ko-KR'
             res = requests.get(url).json()
-            movie = Movie()
-            movie.id = res['id']
-            movie.title = res['title']
-            movie.original_title = res['original_title']
-            movie.release_date = res['release_date']
-            movie.popularity = res['popularity']
-            movie.vote_count = res['vote_count']
-            movie.vote_average = res['vote_average']
-            movie.adult = res['adult']
-            movie.overview = res['overview']
-            movie.original_language = res['original_language']
-            movie.poster_path = res['poster_path']
-            movie.backdrop_path = res['backdrop_path']
-            movie.genres_set = res['genres']
-            if datetime.today().strftime("%Y-%m-%d")>res['release_date']:
-                movie.upcoming = False
+            serializers = MovieCreateSerializer(data=res)
+            release_date= datetime.strptime(res['release_date'],"%Y-%m-%d")
+            if datetime.today()>release_date:
+                upcoming = False
             else:
-                movie.upcoming = True
-            movie.nowplaying = False
-            movie.save()
-  
+                upcoming = True
+            if 0<=(datetime.today()-release_date).days <30:
+                nowplaying = True
+            else:
+                nowplaying = False
+            if serializers.is_valid(raise_exception=True):
+                serializers.save(genres= [i['id'] for i in res['genres']], upcoming=upcoming, nowplaying=nowplaying)
             result = '영화가 추가 되었습니다.'
         else:
             result = '이미 있는 영화입니다.'
         return Response({'message': result})
         
 
-
 @api_view(['POST','PUT'])
 def point(request,movie_pk):
     if request.method == 'POST':
         serializer = MovieStarPointUpdateSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
-            
-            # user= get_object_or_404(User, pk=1)
             movie = get_object_or_404(Movie,pk=movie_pk)
             serializer.save(pointing_user=request.user,pointed_movie=movie)
             return Response({
@@ -93,7 +81,7 @@ def nowplaying(request):
 
 @api_view(['GET'])
 def upcoming(request):
-    movies = Movie.objects.filter(upcoming=True).order_by('-release_date')
+    movies = Movie.objects.filter(upcoming=True).order_by('-release_date')[:10]
     serializer = MovieListSerializer(movies, many=True)
     return Response(serializer.data)
 
@@ -114,9 +102,8 @@ def latest(request):
 
 @api_view(['GET'])
 def recommend(request):
-    User=get_user_model()
-    admin = get_object_or_404(User,pk = 1)
-    print(admin.pointed_movies.pointed_movie)
+    print(request.user.pointed_movies.all())
+    # print(admin.pointed_movies.pointed_movie)
 
     # movies = Movie.objects.filter(upcoming=False).order_by('-release_date')[:10]
     # serializer = MovieListSerializer(movies, many=True)

@@ -1,9 +1,21 @@
 from rest_framework import serializers
-from .models import Movie, MovieStarPoint, Review, Comment
+from .models import Movie, MovieStarPoint, Review, Comment, Genre
 from django.contrib.auth import get_user_model
 from accounts.serializers import CustomUserDetailSerializer
 
 User = get_user_model()
+
+class GenreSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Genre
+        fileds='__all__'
+
+class MovieCreateSerializer(serializers.ModelSerializer):
+    # genres = GenreSerializer(required=False)
+    class Meta:
+        model = Movie
+        exclude = ['genres']
+        # fields = '__all__'
 
 class MovieStarPointSerializer(serializers.ModelSerializer):
     # pointing_user = CustomUserDetailsSerializer(required=False)
@@ -14,7 +26,7 @@ class MovieStarPointSerializer(serializers.ModelSerializer):
 
 class MovieListSerializer(serializers.ModelSerializer):
     pointing_users = MovieStarPointSerializer(source='moviestarpoint_set', many=True, required=False)
-
+    star = serializers.ReadOnlyField()
     class Meta:
         model = Movie
         fields = ('id', 'title','poster_path','vote_average' ,'pointing_users')
