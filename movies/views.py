@@ -115,14 +115,12 @@ def recommend(request):
             res = requests.get(url).json()['results'][:2]
             for j in res:
                 if j['id'] not in recommend_id_list:
-                    recommend_list.append(j)
                     recommend_id_list.append(j['id'])
         cnt=0
-        while len(recommend_list)<10:
+        while len(recommend_id_list)<10:
             url = f'https://api.themoviedb.org/3/movie/{most_movie[0].pointed_movie.id}/recommendations?api_key=fcf50b1b6b84aa2265ae58bcd7596305&language=ko-KR&page=1'
             res = requests.get(url).json()['results'][cnt+2]
             if res['id'] not in recommend_id_list:
-                recommend_list.append(res)
                 recommend_id_list.append(res['id'])
                 cnt+=1
 
@@ -144,6 +142,10 @@ def recommend(request):
                     nowplaying = False
                 if serializers.is_valid(raise_exception=True):
                     serializers.save(genres= [i['id'] for i in res['genres']], upcoming=upcoming, nowplaying=nowplaying, overview=res['overview'])
+        
+        for reco_id in recommend_id_list:
+            movie = get_object_or_404(Movie,pk=reco_id)
+            recommend_list.append(movie)
         serializer = MovieListSerializer(recommend_list, many=True)
         return Response(serializer.data)
 
