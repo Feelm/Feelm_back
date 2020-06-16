@@ -5,22 +5,28 @@ from .models import RequestBoard, FreeBoard
 from .serializers import *
 # Create your views here.
 
-@api_view(['GET','POST'])
+@api_view(['GET','POST','PUT'])
 def requests(request):
     if request.method == 'GET':
-        requestboards = RequestBoard.objects.all()
+        requestboards = RequestBoard.objects.order_by('-id')
         serializer = RequestBoardSerializer(requestboards, many=True)
         return Response(serializer.data)
     elif request.method == 'POST':
         serializer = RequestBoardCreateSerializer(data = request.data)
         if serializer.is_valid(raise_exception=True):
             serializer.save(user=request.user)
-            return Response({ 'message': '요청 완료' })
+            return Response({ 'message': '요청글 작성 완료' })
+    elif request.method =='PUT':
+        request_id = request.data['request_id']
+        request_board=get_object_or_404(RequestBoard,pk= request_id)
+        request_board.check=True
+        request_board.save()
+        return Response({'message': '확인완료'})
 
 @api_view(['GET','POST'])
 def free(request):
     if request.method == 'GET':
-        FreeBoards = FreeBoard.objects.all()
+        FreeBoards = FreeBoard.objects.order_by('-id')
         serializer = FreeBoardSerializer(FreeBoards, many=True)
         return Response(serializer.data)
     elif request.method == 'POST':
