@@ -56,7 +56,7 @@ def movie_detail(request,movie_pk):
 @api_view(['POST','PUT'])
 def point(request,movie_pk):
     if request.method == 'POST':
-        print(request.GET,request.POST)
+        print(request.GET,request.POST, request.data)
         serializer = MovieStarPointUpdateSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
             movie = get_object_or_404(Movie,pk=movie_pk)
@@ -103,6 +103,7 @@ def latest(request):
 
 @api_view(['GET'])
 def recommend(request):
+    print(request.user)
     if not request.user.is_authenticated or request.user.pointed_movies.count()==0:
         movies = Movie.objects.filter(upcoming=False).order_by('-release_date')[:10]
         serializer = MovieListSerializer(movies, many=True)
@@ -126,8 +127,8 @@ def recommend(request):
                 cnt+=1
 
         # 추천영화가 db에 없으면 db에 추가
-        for i in recommend_list:
-            temp_id = i['id']
+        for i in recommend_id_list:
+            temp_id = i
             if not Movie.objects.filter(id=temp_id).exists():
                 url = f'https://api.themoviedb.org/3/movie/{temp_id}?api_key=fcf50b1b6b84aa2265ae58bcd7596305&language=ko-KR'
                 res = requests.get(url).json()
@@ -141,11 +142,16 @@ def recommend(request):
                     nowplaying = True
                 else:
                     nowplaying = False
+                if not res['overview'] : 
+                    res['overview'] = "제공하지않음"
+                if not res['backdrop_path']:
+                    res['backdrop_path']="/"
+                if not res['poster_path']:
+                    res['poster_path']='/'
                 if serializers.is_valid(raise_exception=True):
-                    serializers.save(genres= [i['id'] for i in res['genres']], upcoming=upcoming, nowplaying=nowplaying, overview=res['overview'])
-        
+                    serializers.save(genres= [i['id'] for i in res['genres']], upcoming=upcoming, nowplaying=nowplaying, overview=res['overview'], backdrop_path=res['backdrop_path'],poster_path=res['poster_path'])
         for reco_id in recommend_id_list:
-            movie = get_object_or_404(Movie,pk=reco_id)
+            movie = get_object_or_404(Movie, pk=reco_id)
             recommend_list.append(movie)
         serializer = MovieListSerializer(recommend_list, many=True)
         return Response(serializer.data)

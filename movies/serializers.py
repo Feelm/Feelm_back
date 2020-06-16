@@ -13,6 +13,7 @@ class GenreSerializer(serializers.ModelSerializer):
 class MovieCreateSerializer(serializers.ModelSerializer):
     # genres = GenreSerializer(required=False)
     # overview=serializers.ModelSerializer(required=False)
+    # backdrop_path = serializers.ModelSerializer(required=False)
     class Meta:
         model = Movie
         exclude = ['genres',]
