@@ -33,7 +33,7 @@ class Movie(models.Model):
         if pointing_num ==0:
             return self.vote_average
         else:
-            return self.moviestarpoint_set.aggregate(Avg('star_point'))['star_point__avg']
+            return round(self.moviestarpoint_set.aggregate(Avg('star_point'))['star_point__avg'],1)
 
 
 

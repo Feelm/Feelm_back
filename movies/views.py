@@ -103,7 +103,6 @@ def latest(request):
 
 @api_view(['GET'])
 def recommend(request):
-    print(request.user)
     if not request.user.is_authenticated or request.user.pointed_movies.count()==0:
         movies = Movie.objects.filter(upcoming=False).order_by('-release_date')[:10]
         serializer = MovieListSerializer(movies, many=True)
