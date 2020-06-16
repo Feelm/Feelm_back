@@ -102,13 +102,42 @@ def latest(request):
 
 @api_view(['GET'])
 def recommend(request):
-    print(request.user.pointed_movies.all())
-    # print(admin.pointed_movies.pointed_movie)
-
-    # movies = Movie.objects.filter(upcoming=False).order_by('-release_date')[:10]
-    # serializer = MovieListSerializer(movies, many=True)
-    # return Response(serializer.data)
-    return
+    if not request.user.is_authenticated or request.user.pointed_movies.count()==0:
+        movies = Movie.objects.filter(upcoming=False).order_by('-release_date')[:10]
+        serializer = MovieListSerializer(movies, many=True)
+        return Response(serializer.data) 
+    elif request.user.pointed_movies.count()>0:
+        recommend_list =[]
+        most_movie = request.user.moviestarpoint_set.order_by('-star_point')[:5]
+        for i in most_movie:
+            url = f'https://api.themoviedb.org/3/movie/{i.pointed_movie.id}/recommendations?api_key=fcf50b1b6b84aa2265ae58bcd7596305&language=ko-KR&page=1'
+            res = requests.get(url).json()['results'][:2]
+            recommend_list.extend(res)
+        if len(recommend_list)<10:
+            d=10-len(recommend_list)
+            url = f'https://api.themoviedb.org/3/movie/{most_movie[0].pointed_movie.id}/recommendations?api_key=fcf50b1b6b84aa2265ae58bcd7596305&language=ko-KR&page=1'
+            res = requests.get(url).json()['results'][2:2+d]
+            recommend_list.extend(res)
+        for i in recommend_list:
+            temp_id = i['id']
+            if not Movie.objects.filter(id=temp_id).exists():
+                url = f'https://api.themoviedb.org/3/movie/{temp_id}?api_key=fcf50b1b6b84aa2265ae58bcd7596305&language=ko-KR'
+                res = requests.get(url).json()
+                print(res)
+                serializers = MovieCreateSerializer(data=res)
+                release_date= datetime.strptime(res['release_date'],"%Y-%m-%d")
+                if datetime.today()>release_date:
+                    upcoming = False
+                else:
+                    upcoming = True
+                if 0<=(datetime.today()-release_date).days <30:
+                    nowplaying = True
+                else:
+                    nowplaying = False
+                if serializers.is_valid(raise_exception=True):
+                    serializers.save(genres= [i['id'] for i in res['genres']], upcoming=upcoming, nowplaying=nowplaying, overview=res['overview'])
+        serializer = MovieListSerializer(recommend_list, many=True)
+        return Response(serializer.data)
 
 
 @api_view(['GET','POST'])
