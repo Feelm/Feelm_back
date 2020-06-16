@@ -94,7 +94,7 @@ def recent(request):
 
 @api_view(['GET'])
 def latest(request):
-    movies = Movie.objects.order_by('-release_date')[:10]
+    movies = Movie.objects.filter(adult=False).order_by('-release_date')[:10]
     ran_movie = random.randrange(0,10)
     serializer = MovieDetailSerializer(movies[ran_movie])
     return Response(serializer.data)
@@ -113,11 +113,14 @@ def recommend(request):
             url = f'https://api.themoviedb.org/3/movie/{i.pointed_movie.id}/recommendations?api_key=fcf50b1b6b84aa2265ae58bcd7596305&language=ko-KR&page=1'
             res = requests.get(url).json()['results'][:2]
             recommend_list.extend(res)
+        recommend_list = list(set(recommend_list))
         if len(recommend_list)<10:
             d=10-len(recommend_list)
             url = f'https://api.themoviedb.org/3/movie/{most_movie[0].pointed_movie.id}/recommendations?api_key=fcf50b1b6b84aa2265ae58bcd7596305&language=ko-KR&page=1'
             res = requests.get(url).json()['results'][2:2+d]
             recommend_list.extend(res)
+
+        # 추천영화가 db에 없으면 db에 추가
         for i in recommend_list:
             temp_id = i['id']
             if not Movie.objects.filter(id=temp_id).exists():
