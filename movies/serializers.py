@@ -29,7 +29,7 @@ class MovieListSerializer(serializers.ModelSerializer):
     star = serializers.ReadOnlyField()
     class Meta:
         model = Movie
-        fields = ('id', 'title','poster_path','vote_average' ,'pointing_users')
+        fields = ('id', 'title','poster_path','vote_average' ,'pointing_users','star')
         # fields = '__all__'
         read_only_fields = ['pointing_users']
 
