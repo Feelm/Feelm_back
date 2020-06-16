@@ -56,6 +56,7 @@ def movie_detail(request,movie_pk):
 @api_view(['POST','PUT'])
 def point(request,movie_pk):
     if request.method == 'POST':
+        print(request.GET,request.POST)
         serializer = MovieStarPointUpdateSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
             movie = get_object_or_404(Movie,pk=movie_pk)

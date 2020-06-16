@@ -39,6 +39,8 @@ class MovieStarPointUpdateSerializer(serializers.ModelSerializer):
     # pointing_users = MovieStarPointSerializer(source='moviestarpoint_set', many=True, required=False)
     pointing_user = serializers.ModelSerializer(required=False)
     pointed_movie = serializers.ModelSerializer(required=False)
+    # star_point = serializers.ModelSerializer()
+    # print(star_point)
     class Meta:
         model = MovieStarPoint
         fields = '__all__'
