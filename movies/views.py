@@ -132,12 +132,18 @@ def recommend(request):
                 if j['id'] not in recommend_id_list:
                     recommend_id_list.append(j['id'])
         cnt=0
+        ddd=0
         while len(recommend_id_list)<10:
-            url = f'https://api.themoviedb.org/3/movie/{most_movie[0].pointed_movie.id}/recommendations?api_key=fcf50b1b6b84aa2265ae58bcd7596305&language=ko-KR&page=1'
-            res = requests.get(url).json()['results'][cnt+2]
-            if res['id'] not in recommend_id_list:
-                recommend_id_list.append(res['id'])
-                cnt+=1
+            print(most_movie[0].pointed_movie.id)
+            url = f'https://api.themoviedb.org/3/movie/{most_movie[ddd].pointed_movie.id}/recommendations?api_key=fcf50b1b6b84aa2265ae58bcd7596305&language=ko-KR&page=1'
+            res = requests.get(url).json()['results']
+            if len(res)!=0:
+                res=res[cnt+2]
+                if res['id'] not in recommend_id_list:
+                    recommend_id_list.append(res['id'])
+                    cnt+=1
+            else:
+                ddd+=1
 
         # 추천영화가 db에 없으면 db에 추가
         for i in recommend_id_list:
