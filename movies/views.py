@@ -104,10 +104,12 @@ def latest(request):
 @api_view(['GET'])
 def recommend(request):
     if not request.user.is_authenticated or request.user.pointed_movies.count()==0:
+        print(999999999999)
         movies = Movie.objects.filter(upcoming=False).order_by('-release_date')[:10]
         serializer = MovieListSerializer(movies, many=True)
         return Response(serializer.data) 
     elif request.user.pointed_movies.count()>0:
+        print('로그인상태')
         recommend_list =[]
         recommend_id_list=[]
         most_movie = request.user.moviestarpoint_set.order_by('-star_point')[:5]
@@ -132,15 +134,21 @@ def recommend(request):
                 url = f'https://api.themoviedb.org/3/movie/{temp_id}?api_key=fcf50b1b6b84aa2265ae58bcd7596305&language=ko-KR'
                 res = requests.get(url).json()
                 serializers = MovieCreateSerializer(data=res)
-                release_date= datetime.strptime(res['release_date'],"%Y-%m-%d")
-                if datetime.today()>release_date:
+                if not res['release_date']=='':
+                    release_date= datetime.strptime(res['release_date'],"%Y-%m-%d")
+                    if datetime.today()>release_date:
+                        upcoming = False
+                    else:
+                        upcoming = True
+                    if 0<=(datetime.today()-release_date).days <30:
+                        nowplaying = True
+                    else:
+                        nowplaying = False
+                else:
                     upcoming = False
-                else:
-                    upcoming = True
-                if 0<=(datetime.today()-release_date).days <30:
-                    nowplaying = True
-                else:
                     nowplaying = False
+                    res['release_date'] = datetime.utcfromtimestamp(0).date()
+                    print(res['release_date'].date())
                 if not res['overview'] : 
                     res['overview'] = "제공하지않음"
                 if not res['backdrop_path']:
@@ -148,7 +156,8 @@ def recommend(request):
                 if not res['poster_path']:
                     res['poster_path']='/'
                 if serializers.is_valid(raise_exception=True):
-                    serializers.save(genres= [i['id'] for i in res['genres']], upcoming=upcoming, nowplaying=nowplaying, overview=res['overview'], backdrop_path=res['backdrop_path'],poster_path=res['poster_path'])
+                    serializers.save(release_date=res['release_date'],genres= [i['id'] for i in res['genres']], upcoming=upcoming, nowplaying=nowplaying, overview=res['overview'], backdrop_path=res['backdrop_path'],poster_path=res['poster_path'])
+        print('2342903rufj9023jf0')
         for reco_id in recommend_id_list:
             movie = get_object_or_404(Movie, pk=reco_id)
             recommend_list.append(movie)

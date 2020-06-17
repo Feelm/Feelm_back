@@ -2,7 +2,7 @@ from rest_framework import serializers
 from .models import Movie, MovieStarPoint, Review, Comment, Genre
 from django.contrib.auth import get_user_model
 from accounts.serializers import CustomUserDetailSerializer
-
+import datetime
 User = get_user_model()
 
 class GenreSerializer(serializers.ModelSerializer):
@@ -14,9 +14,10 @@ class MovieCreateSerializer(serializers.ModelSerializer):
     # genres = GenreSerializer(required=False)
     # overview=serializers.ModelSerializer(required=False)
     # backdrop_path = serializers.ModelSerializer(required=False)
+    # release_date = serializers.DateField(required=False)
     class Meta:
         model = Movie
-        exclude = ['genres',]
+        exclude = ['genres','release_date']
         # fields = '__all__'
 
 class MovieStarPointSerializer(serializers.ModelSerializer):
