@@ -36,17 +36,29 @@ def movie_detail(request,movie_pk):
             url = f'https://api.themoviedb.org/3/movie/{movie_pk}?api_key=fcf50b1b6b84aa2265ae58bcd7596305&language=ko-KR'
             res = requests.get(url).json()
             serializers = MovieCreateSerializer(data=res)
-            release_date= datetime.strptime(res['release_date'],"%Y-%m-%d")
-            if datetime.today()>release_date:
+
+            if not res['release_date']=='':
+                release_date= datetime.strptime(res['release_date'],"%Y-%m-%d")
+                if datetime.today()>release_date:
+                    upcoming = False
+                else:
+                    upcoming = True
+                if 0<=(datetime.today()-release_date).days <30:
+                    nowplaying = True
+                else:
+                    nowplaying = False
+            else:
                 upcoming = False
-            else:
-                upcoming = True
-            if 0<=(datetime.today()-release_date).days <30:
-                nowplaying = True
-            else:
                 nowplaying = False
+                res['release_date'] = datetime.utcfromtimestamp(0).date()
+            if not res['overview'] : 
+                res['overview'] = "제공하지않음"
+            if not res['backdrop_path']:
+                res['backdrop_path']="/"
+            if not res['poster_path']:
+                res['poster_path']='/'
             if serializers.is_valid(raise_exception=True):
-                serializers.save(genres= [i['id'] for i in res['genres']], upcoming=upcoming, nowplaying=nowplaying)
+                serializers.save(release_date=res['release_date'],genres= [i['id'] for i in res['genres']], upcoming=upcoming, nowplaying=nowplaying, overview=res['overview'], backdrop_path=res['backdrop_path'],poster_path=res['poster_path'])
             result = '영화가 추가 되었습니다.'
         else:
             result = '이미 있는 영화입니다.'
@@ -131,6 +143,7 @@ def recommend(request):
         for i in recommend_id_list:
             temp_id = i
             if not Movie.objects.filter(id=temp_id).exists():
+                print(temp_id)
                 url = f'https://api.themoviedb.org/3/movie/{temp_id}?api_key=fcf50b1b6b84aa2265ae58bcd7596305&language=ko-KR'
                 res = requests.get(url).json()
                 serializers = MovieCreateSerializer(data=res)
