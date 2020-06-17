@@ -16,6 +16,7 @@ class UserManager(BaseUserManager):
             raise ValueError("age is needed")
         if sex not in [0,1]:
             raise ValueError("sex is needed")
+        print(age, sex, name)
         user = self.model(
             email=self.normalize_email(email),
             name=name,

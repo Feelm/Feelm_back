@@ -3,6 +3,8 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from .models import RequestBoard, FreeBoard
 from .serializers import *
+from django.template.defaultfilters import linebreaks
+
 # Create your views here.
 
 @api_view(['GET','POST','PUT'])
@@ -44,6 +46,7 @@ def free_detail(request, free_pk):
     if request.method == 'GET':
         freeboard = get_object_or_404(FreeBoard, pk= free_pk)
         freeboard.view_count+=1
+        freeboard.content = linebreaks(freeboard.content)
         freeboard.save()
         serializer = FreeBoardSerializer(freeboard)
         return Response(serializer.data)
