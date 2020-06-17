@@ -5,6 +5,7 @@ from .models import RequestBoard, FreeBoard
 from .serializers import *
 from django.template.defaultfilters import linebreaks
 
+
 # Create your views here.
 
 @api_view(['GET','POST','PUT'])
