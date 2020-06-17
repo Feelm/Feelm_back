@@ -56,7 +56,6 @@ class Review(models.Model):
     @property
     def like(self):
         number = self.like_users.count()
-        print(number)
         return number
 
 
