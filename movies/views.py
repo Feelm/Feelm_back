@@ -148,7 +148,6 @@ def recommend(request):
                     upcoming = False
                     nowplaying = False
                     res['release_date'] = datetime.utcfromtimestamp(0).date()
-                    print(res['release_date'].date())
                 if not res['overview'] : 
                     res['overview'] = "제공하지않음"
                 if not res['backdrop_path']:
