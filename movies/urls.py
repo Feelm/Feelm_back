@@ -21,9 +21,14 @@ urlpatterns = [
     path('recommend/', views.recommend, name = 'recommend'),
     # 가장 최신작 랜덤 1개
     path('latest/', views.latest, name='latest'),
+
+
+
     # 리뷰 리스트 GET,생성 POST 
     # n/h
     path('<int:movie_pk>/reviews/', views.review, name='review'),
+
+    
     # 리뷰 하나 세부 작업 | 리뷰 상세 GET , 리뷰 수정 PUT , 리뷰 삭제 DELETE 
     # n/h/h
     path('<int:movie_pk>/reviews/<int:review_pk>/', views.review_detail, name='review_detail'),

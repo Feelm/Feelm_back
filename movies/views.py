@@ -13,7 +13,7 @@ import random
 import requests
 from datetime import datetime
 # 라인브레이크
-# from django.template.defaultfilters import linebreaks
+from django.template.defaultfilters import linebreaks
 
 
 User = get_user_model()
@@ -29,6 +29,7 @@ def index(request):
 def movie_detail(request,movie_pk):
     if request.method == 'GET':
         movie = get_object_or_404(Movie, pk=movie_pk)
+        
         serializer = MovieDetailSerializer(movie)
         return Response(serializer.data)
     elif request.method == 'POST':
@@ -209,6 +210,7 @@ def review_detail(request,movie_pk,review_pk):
     if request.method == 'GET':
         review = get_object_or_404(Review, pk= review_pk)
         review.view_count+=1
+        review.content = linebreaks()
         review.save()
         serializer = ReviewDetailSerializer(review)
         return Response(serializer.data)
