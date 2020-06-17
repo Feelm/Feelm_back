@@ -24,6 +24,6 @@ class FreeBoard(models.Model):
 
     @property
     def like(self):
-        number = self.like_user_set.count()
+        number = self.like_users.count()
         print(number)
         return number

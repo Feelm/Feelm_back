@@ -20,11 +20,12 @@ class FreeBoardCreateSerializer(serializers.ModelSerializer):
     user = serializers.ModelSerializer(required = False)
     class Meta:
         model = FreeBoard
-        fields= '__all__'
-        # fields = ['movie_id', 'movie_name', 'title','user']
+        # fields= '__all__'
+        fields = ['title', 'content', 'user']
 
 class FreeBoardSerializer(serializers.ModelSerializer):
     user = serializers.SerializerMethodField()
+    like = serializers.ReadOnlyField()
     def get_user(self,obj):
         return obj.user.name
     class Meta:

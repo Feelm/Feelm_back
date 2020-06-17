@@ -30,9 +30,13 @@ def free(request):
         serializer = FreeBoardSerializer(FreeBoards, many=True)
         return Response(serializer.data)
     elif request.method == 'POST':
+        print(111111111111111111)
         serializer = FreeBoardCreateSerializer(data = request.data)
         if serializer.is_valid(raise_exception=True):
+            print(request.data)
             serializer.save(user=request.user)
+
+            print(33333333333333333)
             return Response({ 'message': '자게 글 작성 완료' })
 
 @api_view(['GET','PUT','DELETE'])
@@ -60,4 +64,22 @@ def free_detail(request, free_pk):
             result = '다른사람의 글은 삭제 할 수 없습니다.'
         return Response({
                 "message": result,
+                })
+
+@api_view(['POST'])
+def free_like(request,free_pk):
+    if request.method == 'POST':
+        freeboard = get_object_or_404(FreeBoard, pk=free_pk)
+        user = request.user
+        if user != freeboard.user :
+            if freeboard.like_users.filter(id=user.id).exists():
+                freeboard.like_users.remove(user)
+                result = f"{request.user}님이 {freeboard.user}님의 {free_pk}글의 좋아요를 취소합니다."
+            else:
+                freeboard.like_users.add(user)
+                result = f"{request.user}님이 {freeboard.user}님의 {free_pk}글을 좋아합니다."
+        else:
+            result = "자신의 글은 좋아요 할 수 없습니다."
+        return Response({
+                "message": result
                 })

@@ -46,8 +46,21 @@ class MovieStarPointUpdateSerializer(serializers.ModelSerializer):
         model = MovieStarPoint
         fields = '__all__'
 
+class CommentSerializer(serializers.ModelSerializer):
+    user = serializers.SerializerMethodField()
+    def get_user(self,obj):
+        return obj.user.name
+    class Meta:
+        model = Comment
+        fields = '__all__'
+
 class ReviewDetailSerializer(serializers.ModelSerializer):
+    user = serializers.SerializerMethodField()
     like = serializers.ReadOnlyField()
+    comments = CommentSerializer(source='comment_set' , many=True)
+    
+    def get_user(self,obj):
+        return obj.user.name
     class Meta:
         model = Review
         fields = '__all__'
@@ -73,7 +86,7 @@ class ReviewCreateSerializer(serializers.ModelSerializer):
 
 class ReviewSerializer(serializers.ModelSerializer):
     user = serializers.SerializerMethodField()
-
+    like = serializers.ReadOnlyField()
     def get_user(self,obj):
         return obj.user.name
     class Meta:
@@ -89,13 +102,7 @@ class CommentCreateSerializer(serializers.ModelSerializer):
         model = Comment
         fields = '__all__'
 
-class CommentSerializer(serializers.ModelSerializer):
-    user = serializers.SerializerMethodField()
-    def get_user(self,obj):
-        return obj.user.name
-    class Meta:
-        model = Comment
-        fields = '__all__'
+
 
 
 
